@@ -74,11 +74,8 @@ class CardSet:
             self.set[rand_index] = self.set[i]
             self.set[i] = rand_card
 
-    def sort(self):
-        self.set = sorted(self.set, key=lambda x: self.sort_help_func(x))
-
-    def sort_help_func(self, card):  # Makes it so that suits aren't sorted alphabetically, but in custom HSRK order.
-        return card.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[card.get_suit()]
+    def sort(self): # Suits aren't sorted alphabetically, but in custom HSRK order.
+        self.set = sorted(self.set, key=lambda x: x.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_suit()])
 
     def pick_rand(self, n, **kwargs):
         '''

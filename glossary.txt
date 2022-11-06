@@ -8,3 +8,4 @@ trick cards = kort som spelats i nuvarande sticket. De som ligger på bordet.
 legal cards = kort som spelaren kan spela, enligt stickkorten. t.ex: klöver 2 är spelat först. endast klöver får spelas.
 renons suits = kulörer som spelaren är renons i.
 discard = att saka
+shooting the moon / grand slam = storslam

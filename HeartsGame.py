@@ -35,7 +35,11 @@ class HeartsGame:
         for x in range(0, 13):  # Play all the tricks
             starting_agent = self.play_trick(starting_agent,rn=round_number+1, tn=x+1)
         for agent in self.agents:
-            agent.points += tally_points(agent.value_cards)
+            if len(agent.value_cards.set) == 15:        # Grand slam handling
+                agent.points += 26
+            else:
+                agent.points += tally_points(agent.value_cards)
+        self.reset_cards()
         return
 
     def play_trick(self, starting_agent, **kwargs):
@@ -83,6 +87,12 @@ class HeartsGame:
         for target in targets:
             target.add_to_hand(self.deck.pick_rand(n=13, destructive=True))
 
+    def reset_cards(self):
+        for agent in self.agents:
+            agent.reset_cards()
+        self.deck.clear()
+        self.deck.generate_full_deck()
+        self.played_cards.clear()
 
 def tally_points(cards):
     p = 0
