@@ -1,0 +1,10 @@
+I'm not used to playing self in English, so this is a little
+glossary for the terms I use for my variables.
+
+played cards = kort som har spelats under kortlekens gång.
+value cards = kort som har poäng knutna till sig.
+taken value cards = värdekort som den spelaren har tagit i ett stick.
+trick cards = kort som spelats i nuvarande sticket. De som ligger på bordet.
+legal cards = kort som spelaren kan spela, enligt stickkorten. t.ex: klöver 2 är spelat först. endast klöver får spelas.
+renons suits = kulörer som spelaren är renons i.
+discard = att saka
