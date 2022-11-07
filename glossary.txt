@@ -1,4 +1,4 @@
-I'm not used to playing self in English, so this is a little
+I'm not used to playing cards in English, so this is a little
 glossary for the terms I use for my variables.
 
 played cards = kort som har spelats under kortlekens gång.

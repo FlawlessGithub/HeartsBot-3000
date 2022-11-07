@@ -1,4 +1,3 @@
-from Agent import Agent
 from CardSet import CardSet
 
 
@@ -7,22 +6,21 @@ class HeartsGame:
         self.deck = CardSet(populate=True)
         self.played_cards = CardSet()
         self.agents = list(agents)
-        self.play_game(1)
+        self.play_game(4)
 
     def play_game(self, rounds):
         for r in range(rounds):
             self.play_round(r)
             print("\nPOINTS:")
             for agent in self.agents:
-                print(agent.name+": "+str(agent.points))
-        print("Game over!")
-        ranked = sorted(self.agents, key=lambda x: x.points)
+                print(agent.name + ": " + str(agent.points))
+        print("Game over!\n")
+        ranked = sorted(self.agents, key=lambda a: a.points, reverse=True)
         print("FINAL STANDINGS:")
         for agent in ranked:
             print(agent.name + ": " + str(agent.points) + " points")
         winner = ranked[0]
-        print("The winner, with "+str(agent.points)+" points, is "+agent.name+"! Let's give them a round of applause!")
-
+        print("The winner, with " + str(winner.points) + " points, is " + winner.name + "!")
 
     def play_round(self, round_number):
         self.deal(self.agents)
@@ -33,17 +31,15 @@ class HeartsGame:
                 print("Starting agent is: " + starting_agent.name)
 
         for x in range(0, 13):  # Play all the tricks
-            starting_agent = self.play_trick(starting_agent,rn=round_number+1, tn=x+1)
+            starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1)
         for agent in self.agents:
-            if len(agent.value_cards.set) == 15:        # Grand slam handling
-                agent.points += 26
-            else:
-                agent.points += tally_points(agent.value_cards)
+            agent.points += tally_points(agent.value_cards)
         self.reset_cards()
         return
 
     def play_trick(self, starting_agent, **kwargs):
-        print("---------------------------------\nROUND " + str(kwargs.get("rn",1)) + " | TRICK " + str(kwargs.get("tn", 1)) + "\n")
+        print("---------------------------------\nROUND " + str(kwargs.get("rn", 1)) + " | TRICK " + str(
+            kwargs.get("tn", 1)) + "\n")
         start_index = self.agents.index(starting_agent)
         trick = TrickCards(start_index)
         agent_iter = self.agents[start_index:] + self.agents[:start_index]  # Loops around the players
@@ -58,7 +54,7 @@ class HeartsGame:
         print(winner.name + " wins the trick.")
         for agent in agent_iter:
             agent.log_trick(trick)
-        return winner   # next starting_agent
+        return winner  # next starting_agent
 
     def players_send_cards(self, round_number):
         match round_number:
@@ -70,6 +66,7 @@ class HeartsGame:
                 target_mod = +2
             case _:
                 return  # No-send round
+        sent = {}  # target: cards
         for i in range(len(self.agents)):
             j = i + target_mod
             if j > 3:
@@ -77,11 +74,13 @@ class HeartsGame:
             if j < 0:
                 j += 4
             sc = self.agents[i].send_cards(j)
-            self.agents[j].add_to_hand(sc)
+            sent[self.agents[j]] = sc
             print(self.agents[i].name + " sent: ", end="")
             for c in sc:
-                print(c.get_txt_form(), end=" ")
+                print(c.to_string(), end=" ")
             print("to " + self.agents[j].name)
+        for target in sent:
+            target.add_to_hand(sent[target])
 
     def deal(self, targets):
         for target in targets:
@@ -94,17 +93,22 @@ class HeartsGame:
         self.deck.generate_full_deck()
         self.played_cards.clear()
 
+
 def tally_points(cards):
     p = 0
     if len(cards.set) == 0:
         return 5  # Clean table
-    for card in cards.set:
-        if card.get_suit() == "H":
-            p -= 1
-        elif card.get_suit() == "S" and card.get_value() == 13:
-            p -= 13
-        elif card.get_suit() == "R" and card.get_value() == 10:
-            p += 10
+    elif len(cards.set) == 15:
+        return 26
+    else:
+        for card in cards.set:
+            if card.get_suit() == "H":
+                p -= 1
+            elif card.get_suit() == "S":
+                if card.get_value() == 12:
+                    p -= 13
+            elif card.get_suit() == "R" and card.get_value() == 10:
+                p += 10
     return p
 
 
@@ -135,6 +139,3 @@ class TrickCards:
                 if card.get_value() > winner.get_value():
                     winner = card
         return self.cards.set.index(winner)
-
-
-HeartsGame(Agent("Hello"), Agent("Jeremy"), Agent("Jeremiah"), Agent("Jerma985"))

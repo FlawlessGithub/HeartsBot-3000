@@ -19,11 +19,11 @@ class Agent:
     def pick_card(self, trick_cards, **kwarg):
         k2 = self.hand.find_card("K", 2)
         if k2:
-            print(self.name + " played " + k2.get_txt_form() + "!")
-            return k2
-        pickable = self.get_legal_cards(trick_cards)
-        picked_card = pickable[0]  # Placeholder
-        print(self.name + " played " + picked_card.get_txt_form() + "!")
+            picked_card = k2
+        else:
+            pickable = self.get_legal_cards(trick_cards)
+            picked_card = pickable[0]  # Placeholder
+        print(self.name + " played " + picked_card.to_string() + "!")
         if kwarg.get("destructive", True):
             self.remove_from_hand([picked_card])
         return picked_card
