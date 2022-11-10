@@ -1,11 +1,11 @@
-from Agent import Agent
 from HeartsGame import HeartsGame
+from CustomAgents import *
 
 players = [
-    Agent("Hello"),
-    Agent("Jeremy"),
-    Agent("Jeremiah"),
-    Agent("Jerma985")
+    RandomAgent("Big Guy"),
+    RandomAgent("Chicken Soup"),
+    RandomAgent("Andrew Yang"),
+    RandomAgent("Schlatt")
 ]
 
 HeartsGame(*players)

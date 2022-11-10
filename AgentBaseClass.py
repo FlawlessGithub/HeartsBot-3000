@@ -1,13 +1,12 @@
 from CardSet import CardSet
 
 
-class Agent:
+class AgentBaseClass:
     def __init__(self, name):
         self.name = name
         self.hand = CardSet()
         self.value_cards = CardSet()
         self.points = 0
-        self.memory = ''  # Dummy for now. Will be useful later.
 
     def reset_cards(self):
         self.hand.clear()
@@ -16,17 +15,25 @@ class Agent:
     def reset_all(self):
         self.__init__(self.name)
 
-    def pick_card(self, trick_cards, **kwarg):
+    def play_card(self, trick, **kwarg):
         k2 = self.hand.find_card("K", 2)
         if k2:
             picked_card = k2
         else:
-            pickable = self.get_legal_cards(trick_cards)
-            picked_card = pickable[0]  # Placeholder
+            picked_card = self.pick_card(trick)
         print(self.name + " played " + picked_card.to_string() + "!")
         if kwarg.get("destructive", True):
             self.remove_from_hand([picked_card])
         return picked_card
+
+    def pick_card(self, trick):
+        """
+        Override this function in order to make a custom agent.
+        :param trick: The trick currently being played, in form of a TrickCards class.
+        :return: A Card instance from the agent's hand.
+        """
+        pass
+        return self.get_legal_cards(trick)[0]  # Placeholder.
 
     def send_cards(self, target):
         pass  # Target var is in case I want to add some targeting to this thing (e.g: buffer players etc...)
@@ -48,10 +55,10 @@ class Agent:
     def remove_from_hand(self, arr):
         self.hand.remove_cards(arr, resort=True)
 
-    def get_legal_cards(self, trick_cards):  # DO NOT MODIFY
+    def get_legal_cards(self, trick):  # DO NOT MODIFY
         legal_cards = list()
-        if len(trick_cards.cards.set) > 0:
-            suit = trick_cards.get_suit()
+        if len(trick.cards.set) > 0:
+            suit = trick.get_suit()
             for card in self.hand.set:
                 if card.get_suit() == suit:
                     legal_cards.append(card)
