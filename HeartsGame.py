@@ -119,15 +119,20 @@ class TrickCards:
         self.value_cards = CardSet()
 
     def get_suit(self):
+        if self.cards.size == 0:
+            return "Any"
         return self.cards.set[0].get_suit()
 
     def get_cards(self):
-        return self.cards.set
+        return self.cards
+
+    def get_cards_len(self):
+        return self.cards.size
 
     def get_value_cards(self):
         return self.value_cards.set
 
-    def get_trick_points_value(self):
+    def get_trick_point_value(self):
         return tally_points(self.value_cards, clean_tables=False)
 
     def add_card(self, card):
@@ -141,5 +146,13 @@ class TrickCards:
             if card.get_suit() == winner.get_suit():
                 if card.get_value() > winner.get_value():
                     winner = card
-        print(self.get_trick_points_value())
+        # print("This trick was worth "+str(self.get_trick_point_value())+" points.")
         return self.cards.set.index(winner)
+
+    def get_winning_card(self):
+        winner = self.cards.set[0]
+        for card in self.cards.set:
+            if card.get_suit() == winner.get_suit():
+                if card.get_value() > winner.get_value():
+                    winner = card
+        return winner

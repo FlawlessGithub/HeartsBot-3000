@@ -33,7 +33,7 @@ class AgentBaseClass:
         :return: A Card instance from the agent's hand.
         """
         pass
-        return self.get_legal_cards(trick)[0]  # Placeholder.
+        return self.get_legal_cards(trick).set[0]  # Placeholder.
 
     def send_cards(self, target):
         pass  # Target var is in case I want to add some targeting to this thing (e.g: buffer players etc...)
@@ -56,14 +56,20 @@ class AgentBaseClass:
         self.hand.remove_cards(arr, resort=True)
 
     def get_legal_cards(self, trick):  # DO NOT MODIFY
-        legal_cards = list()
+        legal_cards = CardSet()
         if len(trick.cards.set) > 0:
             suit = trick.get_suit()
             for card in self.hand.set:
                 if card.get_suit() == suit:
-                    legal_cards.append(card)
-            if len(legal_cards) == 0:  # You have no self of the correct suit, meaning you can discard any card.
-                legal_cards = self.hand.set
+                    legal_cards.add_cards([card])
+            if legal_cards.size == 0:  # You have no self of the correct suit, meaning you can discard any card.
+                legal_cards.add_cards(self.hand.set)
         else:  # You are the first player. You may start a trick as you please.
-            legal_cards = self.hand.set
+            legal_cards.add_cards(self.hand.set)
         return legal_cards
+
+    def discard_mode(self, trick_suit):
+        if self.hand.get_cards_of_suit(trick_suit).size == 0 and trick_suit is not "Any":
+            return True
+        else:
+            return False

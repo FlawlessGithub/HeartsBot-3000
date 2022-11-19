@@ -30,11 +30,13 @@ class CardSet:
 
     def __init__(self, **kwargs):
         self.set = []
+        self.size = len(self.set)
         if kwargs.get("populate", False):
             self.generate_full_deck()
 
     def clear(self):
         self.set = []
+        self.size = len(self.set)
 
     def generate_full_deck(self):
         """
@@ -44,6 +46,7 @@ class CardSet:
         for s in ["H", "S", "R", "K"]:
             for v in range(2, 15):
                 self.set.append(Card(s, v))
+        self.size = len(self.set)
 
     def print_card_list(self):
         """
@@ -52,7 +55,7 @@ class CardSet:
         :return: N/A
         """
         for c in self.set:
-                print(c.to_string(), end=" ")
+            print(c.to_string(), end=" ")
         print()  # Blank line after card list
 
     def shuffle(self):
@@ -67,8 +70,9 @@ class CardSet:
             self.set[rand_index] = self.set[i]
             self.set[i] = rand_card
 
-    def sort(self): # Suits aren't sorted alphabetically, but in custom HSRK order.
-        self.set = sorted(self.set, key=lambda x: x.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_suit()])
+    def sort(self, **kwargs):  # Suits aren't sorted alphabetically, but in custom HSRK order.
+        self.set = sorted(self.set, key=lambda x: x.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_suit()],
+                          reverse=kwargs.get("reverse_sort", False))
 
     def pick_rand(self, n, **kwargs):
         '''
@@ -80,6 +84,7 @@ class CardSet:
         picked = random.sample(self.set, k=n)
         if d:
             self.remove_cards(picked, resort=False)
+            self.size = len(self.set)
         return picked
 
     def find_card(self, s, v):
@@ -92,8 +97,20 @@ class CardSet:
         '''
         for c in self.set:
             if c.get_suit() == s.upper() and c.get_value() == v:
-                    return c
+                return c
         return False
+
+    def get_cards_of_suit(self, s, **reverse_sort):
+        reverse_sort = reverse_sort.get("reverse_sort", False)
+        rcs = CardSet()
+        if type(s) is not list:
+            s = [s]
+        for suit in s:
+            for c in self.set:
+                if c.get_suit() == suit:
+                    rcs.add_cards([c])
+        rcs.sort(reverse_sort=reverse_sort)
+        return rcs
 
     def add_cards(self, arr, **kwargs):
         for card in arr:
@@ -103,9 +120,11 @@ class CardSet:
                 print(card[0] + str(card[1]) + " is not in the deck!")
         if kwargs.get("resort", False):
             self.sort()
+        self.size = len(self.set)
 
     def remove_cards(self, arr, **kwargs):
         for card in arr:
             self.set.remove(card)
         if kwargs.get("resort", False):
             self.sort()
+        self.size = len(self.set)
