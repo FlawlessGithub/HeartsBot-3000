@@ -19,7 +19,7 @@ class Card:
 
     def is_value_card(self):
         return (self.get_suit() == "H") or (self.get_suit() == "S" and self.get_value() == 12) or (
-                self.get_suit() == "R" and self.get_value() == 10)
+                        self.get_suit() == "R" and self.get_value() == 10)
 
 
 class CardSet:
@@ -52,7 +52,7 @@ class CardSet:
         :return: N/A
         """
         for c in self.set:
-            print(c.to_string(), end=" ")
+                print(c.to_string(), end=" ")
         print()  # Blank line after card list
 
     def shuffle(self):
@@ -67,7 +67,7 @@ class CardSet:
             self.set[rand_index] = self.set[i]
             self.set[i] = rand_card
 
-    def sort(self):  # Suits aren't sorted alphabetically, but in custom HSRK order.
+    def sort(self): # Suits aren't sorted alphabetically, but in custom HSRK order.
         self.set = sorted(self.set, key=lambda x: x.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_suit()])
 
     def pick_rand(self, n, **kwargs):
@@ -92,7 +92,7 @@ class CardSet:
         '''
         for c in self.set:
             if c.get_suit() == s.upper() and c.get_value() == v:
-                return c
+                    return c
         return False
 
     def add_cards(self, arr, **kwargs):

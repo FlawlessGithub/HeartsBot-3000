@@ -45,12 +45,12 @@ class HeartsGame:
         agent_iter = self.agents[start_index:] + self.agents[:start_index]  # Loops around the players
         # instead of cutting off after index 3
         for agent in agent_iter:
-            pc = agent.pick_card(trick)
+            pc = agent.play_card(trick)
             self.played_cards.add_cards([pc])
             trick.add_card(pc)  # The trick is modified by the player, who is motivating
             # their decision by taking the trick (so far) as input.
         winner = agent_iter[trick.determine_winner()]
-        winner.value_cards.add_cards(trick.get_value_cards().set)
+        winner.value_cards.add_cards(trick.get_value_cards())
         print(winner.name + " wins the trick.")
         for agent in agent_iter:
             agent.log_trick(trick)
@@ -94,9 +94,9 @@ class HeartsGame:
         self.played_cards.clear()
 
 
-def tally_points(cards):
+def tally_points(cards, **clean_tables):
     p = 0
-    if len(cards.set) == 0:
+    if len(cards.set) == 0 and clean_tables.get("clean_tables", True):
         return 5  # Clean table
     elif len(cards.set) == 15:
         return 26
@@ -125,7 +125,10 @@ class TrickCards:
         return self.cards.set
 
     def get_value_cards(self):
-        return self.value_cards
+        return self.value_cards.set
+
+    def get_trick_points_value(self):
+        return tally_points(self.value_cards, clean_tables=False)
 
     def add_card(self, card):
         self.cards.add_cards(arr=[card])
@@ -138,4 +141,5 @@ class TrickCards:
             if card.get_suit() == winner.get_suit():
                 if card.get_value() > winner.get_value():
                     winner = card
+        print(self.get_trick_points_value())
         return self.cards.set.index(winner)
