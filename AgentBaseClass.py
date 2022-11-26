@@ -58,9 +58,9 @@ class AgentBaseClass:
     def get_legal_cards(self, trick):  # DO NOT MODIFY
         legal_cards = CardSet()
         if len(trick.cards.set) > 0:
-            suit = trick.get_suit()
+            suit = trick.get_s()
             for card in self.hand.set:
-                if card.get_suit() == suit:
+                if card.get_s() == suit:
                     legal_cards.add_cards([card])
             if legal_cards.size == 0:  # You have no self of the correct suit, meaning you can discard any card.
                 legal_cards.add_cards(self.hand.set)

@@ -8,18 +8,18 @@ class Card:
         self.suit = suit
         self.value = value
 
-    def get_suit(self):
+    def get_s(self):
         return self.suit
 
-    def get_value(self):
+    def get_v(self):
         return self.value
 
     def to_string(self):
-        return self.get_suit() + str(self.get_value())
+        return self.get_s() + str(self.get_v())
 
     def is_value_card(self):
-        return (self.get_suit() == "H") or (self.get_suit() == "S" and self.get_value() == 12) or (
-                        self.get_suit() == "R" and self.get_value() == 10)
+        return (self.get_s() == "H") or (self.get_s() == "S" and self.get_v() == 12) or (
+                self.get_s() == "R" and self.get_v() == 10)
 
 
 class CardSet:
@@ -71,7 +71,7 @@ class CardSet:
             self.set[i] = rand_card
 
     def sort(self, **kwargs):  # Suits aren't sorted alphabetically, but in custom HSRK order.
-        self.set = sorted(self.set, key=lambda x: x.get_value() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_suit()],
+        self.set = sorted(self.set, key=lambda x: x.get_v() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_s()],
                           reverse=kwargs.get("reverse_sort", False))
 
     def pick_rand(self, n, **kwargs):
@@ -96,7 +96,7 @@ class CardSet:
         :return: Either the card or the bool value False.
         '''
         for c in self.set:
-            if c.get_suit() == s.upper() and c.get_value() == v:
+            if c.get_s() == s.upper() and c.get_v() == v:
                 return c
         return False
 
@@ -107,10 +107,58 @@ class CardSet:
             s = [s]
         for suit in s:
             for c in self.set:
-                if c.get_suit() == suit:
+                if c.get_s() == suit:
                     rcs.add_cards([c])
         rcs.sort(reverse_sort=reverse_sort)
         return rcs
+
+    def get_highest_of_suit(self, s):
+        suit_cards = self.get_cards_of_suit(s)
+        if suit_cards.size > 0:
+            highest = Card("", 0)
+            for card in suit_cards.set:
+                if card.get_v() > highest.get_v():
+                    highest = card
+            return highest
+        else:
+            return False
+
+    def get_lowest_of_suit(self, s):
+        suit_cards = self.get_cards_of_suit(s)
+        if suit_cards.size > 0:
+            lowest = Card("", 20)
+            for card in suit_cards.set:
+                if card.get_v() < lowest.get_v():
+                    lowest = card
+            return lowest
+        else:
+            return False
+
+    def get_highest_of_suit_under_v(self, s, v):
+        suit_cards = self.get_cards_of_suit(s)
+        if suit_cards.size > 0:
+            highest = Card("", 0)
+            changed = False
+            for card in suit_cards.set:
+                if highest.get_v() < card.get_v() < v:
+                    highest = card
+                    changed = True
+            if changed:
+                return highest
+        return False
+
+    def get_lowest_of_suit_above_v(self, s, v):
+        suit_cards = self.get_cards_of_suit(s)
+        if suit_cards.size > 0:
+            lowest = Card("", 20)
+            changed = False
+            for card in suit_cards.set:
+                if v < card.get_v() < lowest.get_v():
+                    lowest = card
+                    changed = True
+            if changed:
+                return lowest
+        return False
 
     def add_cards(self, arr, **kwargs):
         for card in arr:

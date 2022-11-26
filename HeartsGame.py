@@ -6,7 +6,7 @@ class HeartsGame:
         self.deck = CardSet(populate=True)
         self.played_cards = CardSet()
         self.agents = list(agents)
-        self.play_game(4)
+        self.play_game(1)
 
     def play_game(self, rounds):
         for r in range(rounds):
@@ -21,6 +21,7 @@ class HeartsGame:
             print(agent.name + ": " + str(agent.points) + " points")
         winner = ranked[0]
         print("The winner, with " + str(winner.points) + " points, is " + winner.name + "!")
+        print("Total points: " + str(sum([a.points for a in self.agents])))
 
     def play_round(self, round_number):
         self.deal(self.agents)
@@ -97,17 +98,17 @@ class HeartsGame:
 def tally_points(cards, **clean_tables):
     p = 0
     if len(cards.set) == 0 and clean_tables.get("clean_tables", True):
-        return 5  # Clean table
+        return 0 # 5  # Clean table
     elif len(cards.set) == 15:
         return 26
     else:
         for card in cards.set:
-            if card.get_suit() == "H":
+            if card.get_s() == "H":
                 p -= 1
-            elif card.get_suit() == "S":
-                if card.get_value() == 12:
+            elif card.get_s() == "S":
+                if card.get_v() == 12:
                     p -= 13
-            elif card.get_suit() == "R" and card.get_value() == 10:
+            elif card.get_s() == "R" and card.get_v() == 10:
                 p += 10
     return p
 
@@ -118,15 +119,15 @@ class TrickCards:
         self.cards = CardSet()
         self.value_cards = CardSet()
 
-    def get_suit(self):
+    def get_s(self):
         if self.cards.size == 0:
             return "Any"
-        return self.cards.set[0].get_suit()
+        return self.cards.set[0].get_s()
 
     def get_cards(self):
         return self.cards
 
-    def get_cards_len(self):
+    def get_len(self):
         return self.cards.size
 
     def get_value_cards(self):
@@ -143,16 +144,16 @@ class TrickCards:
     def determine_winner(self):
         winner = self.cards.set[0]
         for card in self.cards.set:
-            if card.get_suit() == winner.get_suit():
-                if card.get_value() > winner.get_value():
+            if card.get_s() == winner.get_s():
+                if card.get_v() > winner.get_v():
                     winner = card
         # print("This trick was worth "+str(self.get_trick_point_value())+" points.")
         return self.cards.set.index(winner)
 
-    def get_winning_card(self):
+    def get_winning_c(self):
         winner = self.cards.set[0]
         for card in self.cards.set:
-            if card.get_suit() == winner.get_suit():
-                if card.get_value() > winner.get_value():
+            if card.get_s() == winner.get_s():
+                if card.get_v() > winner.get_v():
                     winner = card
         return winner
