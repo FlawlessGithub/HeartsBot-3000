@@ -18,18 +18,30 @@ class SimpleGoldfishAgent(AgentBaseClass):
         # supplementary, for stuff such as setting a memory variable.
 
     def pick_card(self, trick):
-        if self.discard_mode(trick.get_suit()):
+        trick_s = trick.get_s()
+        if trick_s == "Any":  # You're first up to bat, kid!
             return self.get_legal_cards(trick).set[0]
         else:
-            if trick.get_trick_point_value() > 0:
-                print("Trick worth more than nil!!!")
-                if self.takeable(trick):
-                    return self.hand.get_cards_of_suit(trick.get_suit(), reverse_sort=True).set[0]
-            elif trick.get_suit() == "R" and trick.get_winning_card().value >= 10 and trick.get_cards_len == 3:
-                pass
+            r10 = self.hand.find_card("R", 10)
+            winning_v = trick.get_winning_c().get_v()
+            huv = self.hand.get_highest_of_suit_under_v(trick_s, winning_v)
+            lav = self.hand.get_lowest_of_suit_above_v(trick_s, winning_v)
+            if self.discard_mode(trick_s):
+                return self.get_legal_cards(trick).set[0]
+            else:
+                point_v = trick.get_trick_point_value()
+                if point_v > 0 and self.takeable(trick):
+                    return self.hand.get_highest_of_suit(trick_s)
+                elif r10 and point_v > -9 and trick_s == "R" and winning_v < 10 and trick.get_len() == 3:
+                    return r10
+                else:  # point value =< 0 and r10 is not playable
+                    if huv:
+                        return huv
+                    else:
+                        return lav
 
     def takeable(self, trick):
-        trick_suit = trick.get_suit()
+        trick_suit = trick.get_s()
         if trick_suit == "Any":
             print("You're goin' first!")
             return True
@@ -37,10 +49,9 @@ class SimpleGoldfishAgent(AgentBaseClass):
             print("Naaurr cahnt you strait up renons")
             return False
         else:
-            highest_card_of_suit = self.hand.get_cards_of_suit(trick_suit, reverse_sort=True).set[0]
-            if highest_card_of_suit.get_value() > trick.get_winning_card().get_value():
+            if self.hand.get_highest_of_suit(trick_suit).get_v() > trick.get_winning_c().get_v():
                 print("GANKABLE BABY!")
                 return True
             else:
-                print("Skill issue: " + highest_card_of_suit.to_string())
+                print("Skill issue")
                 return False
