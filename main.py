@@ -6,7 +6,7 @@ from CustomAgents import *
 players = [
     RandomAgent("Big Guy"),
     RandomAgent("Chicken Soup"),
-    PointComparerAgent("Jambo",""),
+    SimpleGoldfishAgent("Jambo"),
     RandomAgent("Schlatt")
 ]
 
