@@ -43,15 +43,11 @@ class SimpleGoldfishAgent(AgentBaseClass):
     def takeable(self, trick):
         trick_suit = trick.get_s()
         if trick_suit == "Any":
-            print("You're goin' first!")
             return True
         elif self.discard_mode(trick_suit) is True:
-            print("Naaurr cahnt you strait up renons")
             return False
         else:
             if self.hand.get_highest_of_suit(trick_suit).get_v() > trick.get_winning_c().get_v():
-                print("GANKABLE BABY!")
                 return True
             else:
-                print("Skill issue")
                 return False

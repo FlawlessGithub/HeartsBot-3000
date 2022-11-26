@@ -1,7 +1,6 @@
-import inspect
+import Benchmarking
 from HeartsGame import HeartsGame
 from CustomAgents import *
-
 
 players = [
     RandomAgent("Big Guy"),
@@ -10,4 +9,5 @@ players = [
     RandomAgent("Schlatt")
 ]
 
-HeartsGame(*players)
+# HeartsGame(*players)
+Benchmarking.benchmark(players, 1220)

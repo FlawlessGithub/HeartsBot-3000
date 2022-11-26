@@ -6,58 +6,66 @@ class HeartsGame:
         self.deck = CardSet(populate=True)
         self.played_cards = CardSet()
         self.agents = list(agents)
-        self.play_game(1)
 
-    def play_game(self, rounds):
+    def play_game(self, rounds, **kwargs):
+        print_mode = kwargs.get("print", True)
         for r in range(rounds):
-            self.play_round(r)
-            print("\nPOINTS:")
-            for agent in self.agents:
-                print(agent.name + ": " + str(agent.points))
-        print("Game over!\n")
+            self.play_round(r, print=print_mode)
+            if print_mode:
+                print("\nPOINTS:")
+                for agent in self.agents:
+                    print(agent.name + ": " + str(agent.points))
         ranked = sorted(self.agents, key=lambda a: a.points, reverse=True)
-        print("FINAL STANDINGS:")
-        for agent in ranked:
-            print(agent.name + ": " + str(agent.points) + " points")
         winner = ranked[0]
-        print("The winner, with " + str(winner.points) + " points, is " + winner.name + "!")
-        print("Total points: " + str(sum([a.points for a in self.agents])))
+        if print_mode:
+            print("Game over!\n")
+            print("FINAL STANDINGS:")
+            for agent in ranked:
+                print(agent.name + ": " + str(agent.points) + " points")
+            print("The winner, with " + str(winner.points) + " points, is " + winner.name + "!")
+            print("Total points: " + str(sum([a.points for a in self.agents])))
 
-    def play_round(self, round_number):
+    def play_round(self, round_number, **kwargs):
+        print_mode = kwargs.get("print", True)
         self.deal(self.agents)
-        self.players_send_cards(round_number)
+        self.players_send_cards(round_number, print=print_mode)
         for agent in self.agents:
             if agent.get_hand().find_card("K", 2):
                 starting_agent = agent
-                print("Starting agent is: " + starting_agent.name)
+                if print_mode:
+                    print("Starting agent is: " + starting_agent.name)
 
         for x in range(0, 13):  # Play all the tricks
-            starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1)
+            starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1, print=print_mode)
         for agent in self.agents:
             agent.points += tally_points(agent.value_cards)
         self.reset_cards()
         return
 
     def play_trick(self, starting_agent, **kwargs):
-        print("---------------------------------\nROUND " + str(kwargs.get("rn", 1)) + " | TRICK " + str(
-            kwargs.get("tn", 1)) + "\n")
+        print_mode = kwargs.get("print", True)
+        if print_mode:
+            print("---------------------------------\nROUND " + str(kwargs.get("rn", 1)) + " | TRICK " + str(kwargs.get(
+                "tn", 1)) + "\n")
         start_index = self.agents.index(starting_agent)
         trick = TrickCards(start_index)
         agent_iter = self.agents[start_index:] + self.agents[:start_index]  # Loops around the players
         # instead of cutting off after index 3
         for agent in agent_iter:
-            pc = agent.play_card(trick)
+            pc = agent.play_card(trick, print=print_mode)
             self.played_cards.add_cards([pc])
             trick.add_card(pc)  # The trick is modified by the player, who is motivating
             # their decision by taking the trick (so far) as input.
         winner = agent_iter[trick.determine_winner()]
         winner.value_cards.add_cards(trick.get_value_cards())
-        print(winner.name + " wins the trick.")
+        if print_mode:
+            print(winner.name + " wins the trick.")
         for agent in agent_iter:
             agent.log_trick(trick)
         return winner  # next starting_agent
 
-    def players_send_cards(self, round_number):
+    def players_send_cards(self, round_number, **kwargs):
+        print_mode = kwargs.get("print", True)
         match round_number:
             case 0:
                 target_mod = +1
@@ -76,10 +84,11 @@ class HeartsGame:
                 j += 4
             sc = self.agents[i].send_cards(j)
             sent[self.agents[j]] = sc
-            print(self.agents[i].name + " sent: ", end="")
-            for c in sc:
-                print(c.to_string(), end=" ")
-            print("to " + self.agents[j].name)
+            if print_mode:
+                print(self.agents[i].name + " sent: ", end="")
+                for c in sc:
+                    print(c.to_string(), end=" ")
+                print("to " + self.agents[j].name)
         for target in sent:
             target.add_to_hand(sent[target])
 
@@ -94,11 +103,15 @@ class HeartsGame:
         self.deck.generate_full_deck()
         self.played_cards.clear()
 
+    def reset_points(self):
+        for agent in self.agents:
+            agent.points = 0
+
 
 def tally_points(cards, **clean_tables):
     p = 0
     if len(cards.set) == 0 and clean_tables.get("clean_tables", True):
-        return 0 # 5  # Clean table
+        return 5  # Clean table
     elif len(cards.set) == 15:
         return 26
     else:

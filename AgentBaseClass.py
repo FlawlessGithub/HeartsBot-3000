@@ -21,7 +21,8 @@ class AgentBaseClass:
             picked_card = k2
         else:
             picked_card = self.pick_card(trick)
-        print(self.name + " played " + picked_card.to_string() + "!")
+        if kwarg.get("print", True):
+            print(self.name + " played " + picked_card.to_string() + "!")
         if kwarg.get("destructive", True):
             self.remove_from_hand([picked_card])
         return picked_card
