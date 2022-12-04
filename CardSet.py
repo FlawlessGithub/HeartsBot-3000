@@ -112,6 +112,13 @@ class CardSet:
         rcs.sort(reverse_sort=reverse_sort)
         return rcs
 
+    def get_size_of_suit(self, s):
+        return self.get_cards_of_suit(s).size
+
+    def find_ranges(self, s):
+        pass  # Maybe add something here? Would be useful for situations where an agent has hearts 2 - 6, and could play
+        # any of them with the same effect?
+
     def get_highest_of_suit(self, s):
         suit_cards = self.get_cards_of_suit(s)
         if suit_cards.size > 0:
@@ -133,6 +140,33 @@ class CardSet:
             return lowest
         else:
             return False
+
+    def get_cards_of_suit_under_v(self, s, v):
+        suit_cards = self.get_cards_of_suit(s)
+        return_cards = []
+        if suit_cards.size > 0:
+            for card in suit_cards.set:
+                if card.get_v() < v:
+                    return_cards.append(card)
+            if len(return_cards):
+                rcs = CardSet()
+                rcs.add_cards(return_cards)
+                return rcs
+        return CardSet()
+
+    def get_cards_of_suit_above_v(self, s, v):
+        suit_cards = self.get_cards_of_suit(s)
+        return_cards = []
+        if suit_cards.size > 0:
+            for card in suit_cards.set:
+                if card.get_v() > v:
+                    return_cards.append(card)
+            if len(return_cards):
+                rcs = CardSet()
+                rcs.add_cards(return_cards)
+                return rcs
+        return CardSet()
+
 
     def get_highest_of_suit_under_v(self, s, v):
         suit_cards = self.get_cards_of_suit(s)

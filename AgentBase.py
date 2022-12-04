@@ -1,7 +1,7 @@
 from CardSet import CardSet
 
 
-class AgentBaseClass:
+class AgentBase:
     def __init__(self, name):
         self.name = name
         self.hand = CardSet()
@@ -37,12 +37,15 @@ class AgentBaseClass:
         return self.get_legal_cards(trick).set[0]  # Placeholder.
 
     def send_cards(self, target):
-        pass  # Target var is in case I want to add some targeting to this thing (e.g: buffer players etc...)
-        sent_card_1 = self.hand.set[0]
-        sent_card_2 = self.hand.set[1]
-        send = [sent_card_1, sent_card_2]
+        # Target var is in case I want to add some targeting to this thing (e.g: buffer players etc...)
+        send = self.pick_cards_to_send(target)
         self.remove_from_hand(send)
         return send
+
+    def pick_cards_to_send(self, target):
+        sent_card_1 = self.hand.set[0]
+        sent_card_2 = self.hand.set[1]
+        return [sent_card_1, sent_card_2]
 
     def log_trick(self, trick):  # Registers trick to memory (in the future)
         pass
@@ -55,6 +58,12 @@ class AgentBaseClass:
 
     def remove_from_hand(self, arr):
         self.hand.remove_cards(arr, resort=True)
+
+    def is_renons(self, s):
+        if self.hand.get_cards_of_suit(s).size <= 0:
+            return True
+        else:
+            return False
 
     def get_legal_cards(self, trick):  # DO NOT MODIFY
         legal_cards = CardSet()
@@ -70,7 +79,7 @@ class AgentBaseClass:
         return legal_cards
 
     def discard_mode(self, trick_suit):
-        if self.hand.get_cards_of_suit(trick_suit).size == 0 and trick_suit is not "Any":
+        if self.hand.get_cards_of_suit(trick_suit).size == 0 and trick_suit != "Any":
             return True
         else:
             return False

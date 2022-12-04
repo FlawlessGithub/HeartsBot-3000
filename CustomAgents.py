@@ -1,8 +1,8 @@
-from AgentBaseClass import AgentBaseClass
+from AgentBase import AgentBase
 from random import sample
 
 
-class RandomAgent(AgentBaseClass):
+class RandomAgent(AgentBase):
     def __init__(self, name):
         super(RandomAgent, self).__init__(name)  # Calls AgentBaseClass __init__, making this function supplementary,
         # for stuff such as setting a memory variable.
@@ -11,7 +11,7 @@ class RandomAgent(AgentBaseClass):
         return sample(self.get_legal_cards(trick).set, 1)[0]
 
 
-class SimpleGoldfishAgent(AgentBaseClass):
+class SimpleGoldfishAgent(AgentBase):
 
     def __init__(self, name):
         super(SimpleGoldfishAgent, self).__init__(name)  # Calls AgentBaseClass __init__, making this function
@@ -51,3 +51,41 @@ class SimpleGoldfishAgent(AgentBaseClass):
                 return True
             else:
                 return False
+
+class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
+    def __init__(self, name):
+        super(SGAgentWithSendCardLogic, self).__init__(name)
+
+    def pick_cards_to_send(self, target):
+        s12 = self.hand.find_card("S", 12)
+        hand_scores = {}
+        for card in self.hand.set:
+            c_score = 0
+            match card.get_s():
+                case "H":
+                    if card.get_v() >= 7:
+                        c_score += card.get_v() + self.hand.get_cards_of_suit_under_v("H", 7).size
+                    else:
+                        c_score += card.get_v() - self.hand.get_cards_of_suit_above_v("H", 6).size
+                case "S":
+                    if card.get_v() > 12:
+                        c_score += 10 * 13 - self.hand.get_size_of_suit("S")
+                    elif card.get_v() == 12:
+                        if self.hand.get_cards_of_suit("S").size > 7:  # Nobody can burn through your "safe" spades at >7.
+                            c_score += 0  # Just pawn it off on someone else
+                        else:
+                            c_score += (20 - self.hand.get_size_of_suit("S"))
+                    else:
+                        c_score += 0
+                case "R":
+                    if card.get_v() >= 10:
+                        c_score += -100  # Taking R10 above all else
+                    else:
+                        c_score += 0
+                case "K":
+                    c_score += card.get_v() * 0.5
+            hand_scores[card] = c_score
+        c1 = max(hand_scores, key=hand_scores.get)
+        del hand_scores[c1]
+        c2 = max(hand_scores, key=hand_scores.get)
+        return [c1, c2]
