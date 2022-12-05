@@ -3,11 +3,11 @@ from HeartsGame import HeartsGame
 from CustomAgents import *
 
 players = [
-    RandomAgent("Big Guy"),
-    RandomAgent("Chicken Soup"),
+    NyAgent("Temmie"),
+    RandomAgent("DaVinki"),
     SimpleGoldfishAgent("Jambo"),
-    RandomAgent("Schlatt")
+    SGAgentWithSendCardLogic("Peepo")
 ]
 
 # HeartsGame(*players)
-Benchmarking.benchmark(players, 1220)
+Benchmarking.benchmark(players, 100)

@@ -8,6 +8,7 @@ class HeartsGame:
         self.agents = list(agents)
 
     def play_game(self, rounds, **kwargs):
+
         print_mode = kwargs.get("print", True)
         for r in range(rounds):
             self.play_round(r, print=print_mode)
@@ -37,8 +38,11 @@ class HeartsGame:
 
         for x in range(0, 13):  # Play all the tricks
             starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1, print=print_mode)
+        #tot_p = 0
         for agent in self.agents:
             agent.points += tally_points(agent.value_cards)
+            #tot_p += tally_points(agent.value_cards)
+        #print(tot_p)
         self.reset_cards()
         return
 
@@ -140,7 +144,7 @@ class TrickCards:
     def get_cards(self):
         return self.cards
 
-    def get_len(self):
+    def get_pos(self):
         return self.cards.size
 
     def get_value_cards(self):

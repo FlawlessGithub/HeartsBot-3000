@@ -32,3 +32,4 @@ def benchmark(players, trials):
         print("#" + str(i) + ": \"" + p.name + "\" | " + pd[p].agent_type)
         print("     avg. Score: " + str(pd[p].average_score))
         print("     total Score: " + str(pd[p].total_score))
+    print(sum([pd[a].total_score for a in pd]))

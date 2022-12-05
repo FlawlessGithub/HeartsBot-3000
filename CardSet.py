@@ -210,3 +210,36 @@ class CardSet:
         if kwargs.get("resort", False):
             self.sort()
         self.size = len(self.set)
+
+class ProbabilityCardSet (CardSet):
+    def __init__(self):
+        self.probabilities = {}
+        self.generate_unseeded_deck()
+
+    def probability_calculation(self, trick):
+        pass
+
+    def generate_unseeded_deck(self):
+        """
+        Generates full 52-card list on in H => S => R => K order.
+        :return:
+        """
+        for s in ["H", "S", "R", "K"]:
+            for v in range(2, 15):
+                self.probabilities[Card(s, v)] = float()
+        self.size = len(self.probabilities)
+
+    def mod_all_of_suit(self, suit, lambda_function):
+        for card in self.get_cards_of_suit(suit):
+            self.probabilities[card] = lambda_function(self.probabilities[card])
+
+    def get_cards_of_suit(self, s, **reverse_sort):
+        reverse_sort = reverse_sort.get("reverse_sort", False)
+        rcs = []
+        if type(s) is not list:
+            s = [s]
+        for suit in s:
+            for c in self.probabilities:
+                if c.get_s() == suit:
+                    rcs.append(c)
+        return rcs

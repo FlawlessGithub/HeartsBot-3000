@@ -1,4 +1,5 @@
 from AgentBase import AgentBase
+from MemoryClasses import SecondMemory
 from random import sample
 
 
@@ -32,7 +33,7 @@ class SimpleGoldfishAgent(AgentBase):
                 point_v = trick.get_trick_point_value()
                 if point_v > 0 and self.takeable(trick):
                     return self.hand.get_highest_of_suit(trick_s)
-                elif r10 and point_v > -9 and trick_s == "R" and winning_v < 10 and trick.get_len() == 3:
+                elif r10 and point_v > -9 and trick_s == "R" and winning_v < 10 and trick.get_pos() == 3:
                     return r10
                 else:  # point value =< 0 and r10 is not playable
                     if huv:
@@ -51,6 +52,7 @@ class SimpleGoldfishAgent(AgentBase):
                 return True
             else:
                 return False
+
 
 class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
     def __init__(self, name):
@@ -71,7 +73,8 @@ class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
                     if card.get_v() > 12:
                         c_score += 10 * 13 - self.hand.get_size_of_suit("S")
                     elif card.get_v() == 12:
-                        if self.hand.get_cards_of_suit("S").size > 7:  # Nobody can burn through your "safe" spades at >7.
+                        if self.hand.get_cards_of_suit(
+                                "S").size > 7:  # Nobody can burn through your "safe" spades at >7.
                             c_score += 0  # Just pawn it off on someone else
                         else:
                             c_score += (20 - self.hand.get_size_of_suit("S"))
@@ -89,3 +92,18 @@ class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
         del hand_scores[c1]
         c2 = max(hand_scores, key=hand_scores.get)
         return [c1, c2]
+
+
+class NyAgent(AgentBase):
+    def __init__(self, name):
+        super(NyAgent, self).__init__(name)
+        self.memory = SecondMemory(self)
+        self.ap = None
+
+    def pick_card(self, trick):
+        self.ap = trick.get_pos()
+        return self.get_legal_cards(trick).pick_rand(1)[0]
+
+    def log_trick(self, trick):
+        self.memory.log_trick(trick, self.ap)
+
