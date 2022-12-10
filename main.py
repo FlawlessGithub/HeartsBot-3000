@@ -1,13 +1,21 @@
 import Benchmarking
-from HeartsGame import HeartsGame
 from CustomAgents import *
+from HeartsGame import HeartsGame
+from PlayerAgents import *
 
 players = [
-    NyAgent("Temmie"),
+    SGAgentWithSendCardLogic("Temmie"),
     RandomAgent("DaVinki"),
-    SimpleGoldfishAgent("Jambo"),
-    SGAgentWithSendCardLogic("Peepo")
+    RandomAgent("Jambo"),
+    RandomAgent("Peepo")
 ]
 
-# HeartsGame(*players)
-Benchmarking.benchmark(players, 100)
+for player in players:
+    if player.type == "Opponent":
+        player.opponents = players
+'''
+hg = HeartsGame(*players, mode="Part-Auto")
+hg.play_game(4, print=True)
+'''
+
+Benchmarking.benchmark(players, 1000)

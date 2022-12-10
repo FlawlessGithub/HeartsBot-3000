@@ -1,12 +1,16 @@
+from random import sample
+
 from AgentBase import AgentBase
 from MemoryClasses import SecondMemory
-from random import sample
 
 
 class RandomAgent(AgentBase):
     def __init__(self, name):
         super(RandomAgent, self).__init__(name)  # Calls AgentBaseClass __init__, making this function supplementary,
         # for stuff such as setting a memory variable.
+
+    def send_cards(self, target):
+        return sample(self.hand.set, 2)
 
     def pick_card(self, trick):
         return sample(self.get_legal_cards(trick).set, 1)[0]
@@ -20,7 +24,7 @@ class SimpleGoldfishAgent(AgentBase):
 
     def pick_card(self, trick):
         trick_s = trick.get_s()
-        if trick_s == "Any":  # You're first up to bat, kid!
+        if trick_s == "?":  # You're first up to bat, kid!
             return self.get_legal_cards(trick).set[0]
         else:
             r10 = self.hand.find_card("R", 10)
@@ -43,7 +47,7 @@ class SimpleGoldfishAgent(AgentBase):
 
     def takeable(self, trick):
         trick_suit = trick.get_s()
-        if trick_suit == "Any":
+        if trick_suit == "?":
             return True
         elif self.discard_mode(trick_suit) is True:
             return False
@@ -106,4 +110,3 @@ class NyAgent(AgentBase):
 
     def log_trick(self, trick):
         self.memory.log_trick(trick, self.ap)
-

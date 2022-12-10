@@ -1,11 +1,12 @@
-from CardSet import CardSet
+from CardSet import CardSet, str_to_card
 
 
 class HeartsGame:
-    def __init__(self, *agents):
+    def __init__(self, *agents, **kwargs):
         self.deck = CardSet(populate=True)
         self.played_cards = CardSet()
         self.agents = list(agents)
+        self.mode = kwargs.get("mode", "Full-Auto")  # "Full-Auto", "Part-Auto", "Full-Manual"
 
     def play_game(self, rounds, **kwargs):
 
@@ -30,19 +31,28 @@ class HeartsGame:
         print_mode = kwargs.get("print", True)
         self.deal(self.agents)
         self.players_send_cards(round_number, print=print_mode)
-        for agent in self.agents:
-            if agent.get_hand().find_card("K", 2):
-                starting_agent = agent
-                if print_mode:
-                    print("Starting agent is: " + starting_agent.name)
+        if self.mode == "Full-Auto":
+            for agent in self.agents:
+                if agent.get_hand().find_card("K", 2):
+                    starting_agent = agent
+        else:
+            i = 0
+            print("Who played K2?")
+            for agent in self.agents:
+                print(str(i) + ": " + agent.name)
+                i += 1
+            starting_agent = self.agents[int(input())]
+
+        if print_mode:
+            print("Starting agent is: " + starting_agent.name)
 
         for x in range(0, 13):  # Play all the tricks
             starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1, print=print_mode)
-        #tot_p = 0
+        # tot_p = 0
         for agent in self.agents:
             agent.points += tally_points(agent.value_cards)
-            #tot_p += tally_points(agent.value_cards)
-        #print(tot_p)
+            # tot_p += tally_points(agent.value_cards)
+        # print(tot_p)
         self.reset_cards()
         return
 
@@ -94,11 +104,33 @@ class HeartsGame:
                     print(c.to_string(), end=" ")
                 print("to " + self.agents[j].name)
         for target in sent:
-            target.add_to_hand(sent[target])
+            if target.type != "Opponent":
+                target.add_to_hand(sent[target])
 
     def deal(self, targets):
-        for target in targets:
-            target.add_to_hand(self.deck.pick_rand(n=13, destructive=True))
+        if self.mode == "Full-Auto":
+            for target in targets:
+                target.add_to_hand(self.deck.pick_rand(n=13, destructive=True))
+        else:
+            for target in targets:
+                if target.type == "Opponent":
+                    pass
+                else:
+                    # Method 1: Individually
+                    '''
+                    print("Input the cards that "+target.name+" was dealt, one by one, in S# format.")
+                    for i in range(13):
+                        c = input("Card "+str(i+1)+" ")
+                        if c == "?":
+                            break
+                        target.add_to_hand([str_to_card(c)])
+                    '''
+                    # Method 2: Split list
+                    print("Input the cards that " + target.name + " was dealt, as a list, in \"S#,S#,S#\" format.")
+                    cl = input("Cards: ")
+                    if cl != "?":
+                        for c in cl.split(","):
+                            target.add_to_hand([str_to_card(c.strip())])
 
     def reset_cards(self):
         for agent in self.agents:
@@ -138,7 +170,7 @@ class TrickCards:
 
     def get_s(self):
         if self.cards.size == 0:
-            return "Any"
+            return "?"
         return self.cards.set[0].get_s()
 
     def get_cards(self):

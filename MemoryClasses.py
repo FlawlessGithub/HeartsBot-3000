@@ -1,10 +1,12 @@
 from CardSet import CardSet, ProbabilityCardSet
 
+
 def rel_to_abs_plr_order(pos, start_pos):
     abs = pos + start_pos
     if abs > 3:
         abs -= 4
     return abs
+
 
 class SecondMemory:
     def __init__(self, bound_player):
@@ -36,10 +38,6 @@ class SecondMemory:
                 self.players[pn].add_played_card(played_card, trick)  # Adding a breakpoint here breaks the code???
 
 
-
-
-
-
 class BlackBoxAgent2:
     def __init__(self):
         # self.ap = abs_pos
@@ -55,7 +53,7 @@ class BlackBoxAgent2:
 
     def renons_check(self):
         for suit in self.renons:
-            self.hand.mod_all_of_suit(suit, lambda p: p*self.renons[suit])
+            self.hand.mod_all_of_suit(suit, lambda p: p * self.renons[suit])
 
     def add_played_card(self, played_card, trick):
         self.played_cards.add_cards([played_card])
@@ -65,6 +63,8 @@ class BlackBoxAgent2:
     def add_to_hand(self, cards, probability):
         for card in cards:
             self.hand[card] = probability
+
+
 '''
 def n_to_pn(n, initial_p):
     pn = n + initial_p

@@ -1,6 +1,10 @@
 import random
 
 
+def str_to_card(str_form):
+    return Card(str_form[0].upper(), int(str_form[1:]))
+
+
 class Card:
     """Glorified tuple. Has functions for checking suit, value conveniently."""
 
@@ -71,7 +75,7 @@ class CardSet:
             self.set[i] = rand_card
 
     def sort(self, **kwargs):  # Suits aren't sorted alphabetically, but in custom HSRK order.
-        self.set = sorted(self.set, key=lambda x: x.get_v() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4}[x.get_s()],
+        self.set = sorted(self.set, key=lambda x: x.get_v() + 13 * {"H": 1, "S": 2, "R": 3, "K": 4, "?": 5}[x.get_s()],
                           reverse=kwargs.get("reverse_sort", False))
 
     def pick_rand(self, n, **kwargs):
@@ -167,7 +171,6 @@ class CardSet:
                 return rcs
         return CardSet()
 
-
     def get_highest_of_suit_under_v(self, s, v):
         suit_cards = self.get_cards_of_suit(s)
         if suit_cards.size > 0:
@@ -211,7 +214,8 @@ class CardSet:
             self.sort()
         self.size = len(self.set)
 
-class ProbabilityCardSet (CardSet):
+
+class ProbabilityCardSet(CardSet):
     def __init__(self):
         self.probabilities = {}
         self.generate_unseeded_deck()

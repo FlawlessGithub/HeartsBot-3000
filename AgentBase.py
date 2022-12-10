@@ -2,8 +2,9 @@ from CardSet import CardSet
 
 
 class AgentBase:
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         self.name = name
+        self.type = kwargs.get("type", "Bot")  # "Bot", "Opponent", or "Manual"
         self.hand = CardSet()
         self.value_cards = CardSet()
         self.points = 0
@@ -17,7 +18,7 @@ class AgentBase:
 
     def play_card(self, trick, **kwarg):
         k2 = self.hand.find_card("K", 2)
-        if k2:
+        if type(k2) != bool:
             picked_card = k2
         else:
             picked_card = self.pick_card(trick)
