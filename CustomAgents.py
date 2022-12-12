@@ -9,7 +9,7 @@ class RandomAgent(AgentBase):
         super(RandomAgent, self).__init__(name)  # Calls AgentBaseClass __init__, making this function supplementary,
         # for stuff such as setting a memory variable.
 
-    def send_cards(self, target):
+    def pick_cards_to_send(self, target):
         return sample(self.hand.set, 2)
 
     def pick_card(self, trick):
