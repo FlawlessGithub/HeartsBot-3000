@@ -12,6 +12,12 @@ class Card:
         self.suit = suit
         self.value = value
 
+    def __hash__(self):
+        return ord(self.suit)*self.value
+
+    def __eq__(self, other):
+        return self.suit == other.suit and self.value == other.value
+
     def get_s(self):
         return self.suit
 
@@ -214,23 +220,29 @@ class CardSet:
             self.sort()
         self.size = len(self.set)
 
+    def card_in_set(self, *args, **kwargs):
+        if kwargs.get("mode", "object") == "object":
+            return args[0] in self.set
+        else:
+            return Card(args[0], args[1]) in self.set
+
 
 class ProbabilityCardSet(CardSet):
-    def __init__(self):
+    def __init__(self, initial_probabilities):
         self.probabilities = {}
-        self.generate_unseeded_deck()
+        self.generate_blank_probabilities(initial_probabilities)
 
     def probability_calculation(self, trick):
         pass
 
-    def generate_unseeded_deck(self):
+    def generate_blank_probabilities(self, initial_probabilities):
         """
         Generates full 52-card list on in H => S => R => K order.
         :return:
         """
         for s in ["H", "S", "R", "K"]:
             for v in range(2, 15):
-                self.probabilities[Card(s, v)] = float()
+                self.probabilities[Card(s, v)] = initial_probabilities
         self.size = len(self.probabilities)
 
     def mod_all_of_suit(self, suit, lambda_function):
@@ -247,3 +259,17 @@ class ProbabilityCardSet(CardSet):
                 if c.get_s() == suit:
                     rcs.append(c)
         return rcs
+
+    def get_probs_of_suit(self, s):
+        rcs = ProbabilityCardSet(0.0)
+        if type(s) is not list:
+            s = [s]
+        for suit in s:
+            for c in self.probabilities:
+                if c.get_s() == suit:
+                    rcs.probabilities[c] = self.probabilities[c]
+        return rcs
+
+    def mod_cards(self, arr, lambda_function):
+        for card in arr:
+            self.probabilities[card] = lambda_function(self.probabilities[card])

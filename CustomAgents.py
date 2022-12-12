@@ -104,9 +104,25 @@ class NyAgent(AgentBase):
         self.memory = SecondMemory(self)
         self.ap = None
 
+    def add_to_hand(self, arr):
+        super(NyAgent, self).add_to_hand(arr)
+        self.memory.log_new_cards(arr)
+
+    def set_opponents(self, plr_list):
+        super(NyAgent, self).set_opponents(plr_list)
+        self.memory.create_black_boxes(plr_list)
+
     def pick_card(self, trick):
         self.ap = trick.get_pos()
         return self.get_legal_cards(trick).pick_rand(1)[0]
 
     def log_trick(self, trick):
         self.memory.log_trick(trick, self.ap)
+
+    def pick_cards_to_send(self, target):
+        cards_to_send = sample(self.hand.set, 2)
+        self.memory.log_sent_cards(target, cards_to_send)
+        return cards_to_send
+
+    def recalc_probabilities(self):
+        self.memory.recalc_probabilities()

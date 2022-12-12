@@ -13,7 +13,6 @@ class HumanOpponent(AgentBase):
     def __init__(self, name):
         super(HumanOpponent, self).__init__(name)
         self.type = "Opponent"
-        self.opponents = []
 
     def play_card(self, trick, **kwarg):
         return str_to_card(input("What card did " + self.name + " play?"))

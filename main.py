@@ -5,17 +5,12 @@ from PlayerAgents import *
 
 players = [
     SGAgentWithSendCardLogic("Temmie"),
-    RandomAgent("DaVinki"),
+    NyAgent("DaVinki"),
     RandomAgent("Jambo"),
     RandomAgent("Peepo")
 ]
 
-for player in players:
-    if player.type == "Opponent":
-        player.opponents = players
-'''
-hg = HeartsGame(*players, mode="Part-Auto")
-hg.play_game(4, print=True)
-'''
 
-Benchmarking.benchmark(players, 1000)
+hg = HeartsGame(*players, mode="Full-Auto")
+hg.play_game(4, print=True)
+

@@ -7,6 +7,8 @@ class HeartsGame:
         self.played_cards = CardSet()
         self.agents = list(agents)
         self.mode = kwargs.get("mode", "Full-Auto")  # "Full-Auto", "Part-Auto", "Full-Manual"
+        for agent in self.agents:
+            agent.set_opponents(self.agents)
 
     def play_game(self, rounds, **kwargs):
 
@@ -106,6 +108,8 @@ class HeartsGame:
         for target in sent:
             if target.type != "Opponent":
                 target.add_to_hand(sent[target])
+        if print_mode:
+            print("\n", end="")
 
     def deal(self, targets):
         if self.mode == "Full-Auto":

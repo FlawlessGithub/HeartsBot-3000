@@ -1,47 +1,18 @@
-from CardSet import CardSet, ProbabilityCardSet
+from CardSet import Card, CardSet, ProbabilityCardSet
 
 
 def rel_to_abs_plr_order(pos, start_pos):
-    abs = pos + start_pos
-    if abs > 3:
-        abs -= 4
-    return abs
-
-
-class SecondMemory:
-    def __init__(self, bound_player):
-        self.owner = bound_player
-        self.own_abs_pos = None
-        self.players = {}
-
-    def compile_played_cards(self):
-        pcs = CardSet()
-        for player in self.players:
-            pcs.add_cards(self.players[player].played_cards.set)
-
-    def log_sent_cards(self, target_index, cards):
-        self.players[target_index].add_to_hand(cards, 1.0)
-
-    def log_trick(self, trick, self_pos):
-        for n in range(4):
-            pn = rel_to_abs_plr_order(n, trick.initial_player)
-            played_card = trick.get_cards().set[n]
-            if pn not in self.players:
-                self.players[pn] = BlackBoxAgent2()  # Adding a breakpoint here breaks the code???
-                if n == self_pos:
-                    self.own_abs_pos = pn
-                    self.players[pn] = self.owner
-            if n == self_pos:
-                self.own_abs_pos = pn
-                self.players[pn] = self.owner
-            if self.players[pn] != self.owner:
-                self.players[pn].add_played_card(played_card, trick)  # Adding a breakpoint here breaks the code???
-
+    absolute = pos + start_pos
+    if absolute > 3:
+        absolute -= 4
+    return absolute
 
 class BlackBoxAgent2:
-    def __init__(self):
+    def __init__(self, **kwargs):
         # self.ap = abs_pos
-        self.hand = ProbabilityCardSet()  # Dictionary of cards by likelihood* of presence in the hand. (*probability may have no bearing)
+        self.name = kwargs.get("name", "")
+        self.hand = ProbabilityCardSet(kwargs.get("initial_probabilities", 0.33))  # Dictionary of cards by likelihood*
+        # of presence in the hand.
         self.played_cards = CardSet()
         self.value_cards = CardSet()
         self.renons = {
@@ -51,55 +22,119 @@ class BlackBoxAgent2:
             "K": False
         }
 
-    def renons_check(self):
+    def __hash__(self):
+        return ord(self.name)
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def renons_checks(self):
         for suit in self.renons:
             self.hand.mod_all_of_suit(suit, lambda p: p * self.renons[suit])
 
-    def add_played_card(self, played_card, trick):
-        self.played_cards.add_cards([played_card])
-        self.renons[trick.get_s()] = played_card.get_s() != trick.get_s()
-        self.renons_check()
+    def add_value_cards(self, value_card):
+        if type(value_card) != list:
+            value_card = [value_card]
+        self.value_cards.add_cards(value_card)
 
-    def add_to_hand(self, cards, probability):
-        for card in cards:
-            self.hand[card] = probability
+    def mod_cards_of_suit(self, s, lambda_function, **kwarg):
+        self.mod_cards(self.hand.get_cards_of_suit(s), lambda_function)
 
-
-'''
-def n_to_pn(n, initial_p):
-    pn = n + initial_p
-    if pn > 3:
-        pn -= 4
-    return pn
+    def mod_cards(self, arr, lambda_function):
+        if type(arr) != list:
+            arr = [arr]
+        self.hand.mod_cards(arr, lambda_function)
 
 
-class FirstMemory:
-    def __init__(self):
-        self.players = {}
+def filter_out_certains_from_probs(pcs):
+    return_arr = []
+    for c in pcs.probabilities:
+        if 0.0 < pcs.probabilities[c] < 1.0:
+            return_arr.append(c)
+        else:
+            pass
+    return return_arr
 
-    def log_trick(self, agent_pos, trick):
-        for n in range(0, agent_pos):
-            pn = n_to_pn(n, trick.initial_player)
-            played_card = trick.get_cards().set[n]
-            if pn not in self.players:
-                self.players[pn] = BlackBoxAgent()  # Adding a breakpoint here breaks the code???
-            self.players[pn].add_played_card(played_card, trick)  # Adding a breakpoint here breaks the code???
-
-    def eval_trick(self, trick):
-        pass
+def apply_func_if_uncertain(probabilities, lambda_function):
+    for p in probabilities:
+        if 0.0 < probabilities[p] < 1.0:
+            p = probabilities[p]
+        else:
+            p = lambda_function(probabilities[p])
+    return probabilities
 
 
-class BlackBoxAgent:
-    def __init__(self):
+
+class SecondMemory:
+    def __init__(self, bound_player):
+        self.owner = bound_player
+        self.own_abs_pos = None
+        self.players = []
         self.played_cards = CardSet()
-        self.value_cards = CardSet()
-        self.unlikely_cards = CardSet()
-        self.not_cards = CardSet()
-        self.renons = list()
+        self.renons_amounts = {"H": 0, "S": 0, "R": 0, "K": 0}
 
-    def add_played_card(self, card, trick):
-        self.played_cards.add_cards([card])
+    def create_black_boxes(self, players):
+        for plr in players:
+            if plr == self.owner:
+                ip = 0.0
+            else:
+                ip = 0.33
+            self.players.append(BlackBoxAgent2(name=plr.name, initial_probabilities=ip))
 
-    def eval_card(self, card):
-        pass
-'''
+    def mod_cards_for_all(self, arr, lambda_function, **kwarg):
+        for plr in self.players:
+            plr.mod_cards(arr, lambda_function)
+
+    def log_sent_cards(self, target_index, cards):
+        for i in range(4):
+            n = 0.0 + (i == target_index)
+            self.players[i].mod_cards(cards, lambda p: n)
+
+    def log_trick(self, trick, self_pos):
+        trick_cards = trick.get_cards()
+        trick_suit = trick.get_s()
+        for rp in range(4):
+            ap = rel_to_abs_plr_order(rp, trick.initial_player)
+            if trick_cards.set[rp].get_s() != trick_suit:
+                self.players[ap].renons[trick_suit] = True
+            else:
+                self.players[ap].renons[trick_suit] = False
+        winner = self.players[trick.determine_winner()]
+        self.mod_cards_for_all(trick.get_cards().set, lambda p: 0.0)
+        self.played_cards.add_cards(trick.get_cards().set)
+        winner.add_value_cards(trick.get_value_cards())
+        self.recalc_probabilities()
+
+    def log_new_cards(self, arr):
+        for plr in self.players:
+            if plr == self.owner:
+                plr.mod_cards(arr, lambda p: 1.0)
+            else:
+                plr.mod_cards(arr, lambda p: 0.0)
+
+    def recalc_probabilities(self):
+        self.calc_renons_amounts()
+        for suit in self.renons_amounts:
+            suit_renons_amount = self.renons_amounts[suit]
+            n = 3-suit_renons_amount
+            for plr in self.players:
+                cards_to_mod = self.filter_out_certains_from_arr(plr.hand.get_cards_of_suit(suit))
+                plr.mod_cards(cards_to_mod, lambda p: 1.0 / (3 - suit_renons_amount))
+
+    def filter_out_certains_from_arr(self, arr):
+        return_arr = []
+        probs = self.players[0].hand.probabilities
+        for c in arr:
+            if 0.0 < probs[c] < 1.0:
+                return_arr.append(c)
+            else:
+                pass
+        return return_arr
+
+    def calc_renons_amounts(self):
+        for suit in self.renons_amounts:
+            r = 0
+            for plr in self.players:
+                if plr != self.owner:
+                    r += plr.renons[suit]
+            self.renons_amounts[suit] = r

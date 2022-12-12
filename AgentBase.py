@@ -8,6 +8,10 @@ class AgentBase:
         self.hand = CardSet()
         self.value_cards = CardSet()
         self.points = 0
+        self.opponents = []
+
+    def set_opponents(self, plr_list):
+        self.opponents = plr_list
 
     def reset_cards(self):
         self.hand.clear()
