@@ -33,22 +33,22 @@ class HeartsGame:
         print_mode = kwargs.get("print", True)
         self.deal(self.agents)
         self.players_send_cards(round_number, print=print_mode)
-        if self.mode == "Full-Auto":
-            for agent in self.agents:
-                if agent.get_hand().find_card("K", 2):
-                    starting_agent = agent
-        else:
+        starting_agent = ""
+        for agent in self.agents:
+            if agent.get_hand().find_card("K", 5):
+                starting_agent = agent
+        if starting_agent == "":
             i = 0
-            print("Who played K2?")
+            print("Who played K5?")
             for agent in self.agents:
-                print(str(i) + ": " + agent.name)
+                print(f"{i}: {agent.name}")
                 i += 1
             starting_agent = self.agents[int(input())]
 
         if print_mode:
             print("Starting agent is: " + starting_agent.name)
 
-        for x in range(0, 13):  # Play all the tricks
+        for x in range(0, 9):  # Play all the tricks
             starting_agent = self.play_trick(starting_agent, rn=round_number + 1, tn=x + 1, print=print_mode)
         # tot_p = 0
         for agent in self.agents:
@@ -114,7 +114,7 @@ class HeartsGame:
     def deal(self, targets):
         if self.mode == "Full-Auto":
             for target in targets:
-                target.add_to_hand(self.deck.pick_rand(n=13, destructive=True))
+                target.add_to_hand(self.deck.pick_rand(n=9, destructive=True))
         else:
             for target in targets:
                 if target.type == "Opponent":
@@ -130,11 +130,17 @@ class HeartsGame:
                         target.add_to_hand([str_to_card(c)])
                     '''
                     # Method 2: Split list
-                    print("Input the cards that " + target.name + " was dealt, as a list, in \"S#,S#,S#\" format.")
-                    cl = input("Cards: ")
-                    if cl != "?":
-                        for c in cl.split(","):
-                            target.add_to_hand([str_to_card(c.strip())])
+                    try_again = True
+                    while try_again:
+                        print("Input the cards that " + target.name + " was dealt, as a list, in \"S#,S#,S#\" format.")
+                        cl = input("Cards: ")
+                        if cl != "?":
+                            for c in cl.split(","):
+                                try:
+                                    target.add_to_hand([str_to_card(c.strip())])
+                                    try_again = False
+                                except:
+                                    print("Something went wrong! Please try again.")
 
     def reset_cards(self):
         for agent in self.agents:
@@ -152,8 +158,8 @@ def tally_points(cards, **clean_tables):
     p = 0
     if len(cards.set) == 0 and clean_tables.get("clean_tables", True):
         return 5  # Clean table
-    elif len(cards.set) == 15:
-        return 26
+    elif len(cards.set) == 11:
+        return 21
     else:
         for card in cards.set:
             if card.get_s() == "H":

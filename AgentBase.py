@@ -21,9 +21,10 @@ class AgentBase:
         self.__init__(self.name)
 
     def play_card(self, trick, **kwarg):
-        k2 = self.hand.find_card("K", 2)
-        if type(k2) != bool:
-            picked_card = k2
+        start_card = self.hand.find_card("K", 5)
+
+        if type(start_card) != bool:
+            picked_card = start_card
         else:
             picked_card = self.pick_card(trick)
         if kwarg.get("print", True):

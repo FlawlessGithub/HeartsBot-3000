@@ -75,7 +75,6 @@ class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
         super(SGAgentWithSendCardLogic, self).__init__(name)
 
     def pick_cards_to_send(self, target):
-        s12 = self.hand.find_card("S", 12)
         hand_scores = {}
         for card in self.hand.set:
             c_score = 0

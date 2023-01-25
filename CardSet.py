@@ -54,7 +54,7 @@ class CardSet:
         :return:
         """
         for s in ["H", "S", "R", "K"]:
-            for v in range(2, 15):
+            for v in range(5, 14):
                 self.set.append(Card(s, v))
         self.size = len(self.set)
 
