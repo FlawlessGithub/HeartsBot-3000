@@ -7,6 +7,7 @@ def rel_to_abs_plr_order(pos, start_pos):
         absolute -= 4
     return absolute
 
+
 class BlackBoxAgent2:
     def __init__(self, **kwargs):
         # self.ap = abs_pos
@@ -55,6 +56,7 @@ def filter_out_certains_from_probs(pcs):
             pass
     return return_arr
 
+
 def apply_func_if_uncertain(probabilities, lambda_function):
     for p in probabilities:
         if 0.0 < probabilities[p] < 1.0:
@@ -62,7 +64,6 @@ def apply_func_if_uncertain(probabilities, lambda_function):
         else:
             p = lambda_function(probabilities[p])
     return probabilities
-
 
 
 class SecondMemory:
@@ -116,7 +117,7 @@ class SecondMemory:
         self.calc_renons_amounts()
         for suit in self.renons_amounts:
             suit_renons_amount = self.renons_amounts[suit]
-            n = 3-suit_renons_amount
+            n = 3 - suit_renons_amount
             for plr in self.players:
                 cards_to_mod = self.filter_out_certains_from_arr(plr.hand.get_cards_of_suit(suit))
                 plr.mod_cards(cards_to_mod, lambda p: 1.0 / (3 - suit_renons_amount))

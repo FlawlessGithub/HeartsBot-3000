@@ -4,13 +4,13 @@ from HeartsGame import HeartsGame
 from PlayerAgents import *
 
 players = [
-    SGAgentWithSendCardLogic("Temmie"),
-    NyAgent("DaVinki"),
-    RandomAgent("Jambo"),
-    RandomAgent("Peepo")
+    SGAgentWithSendCardLogic("Bot 1"),
+    RandomAgent("Bot 2"),
+    RandomAgent("Bot 3"),
+    RandomAgent("Archimedes!")
 ]
 
 
-hg = HeartsGame(*players, mode="Full-Auto")
-hg.play_game(4, print=True)
+
+Benchmarking.benchmark(players, 10000)
 

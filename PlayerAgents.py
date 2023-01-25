@@ -27,3 +27,7 @@ class ManualAgent(AgentBase):
     def __init__(self, name):
         super(AgentBase, self).__init__(name)
         self.type = "Manual"
+
+    def send_cards(self, target):
+        print("Cards sent:")
+        l = (input("Card 1:"), input("Card 2:"))

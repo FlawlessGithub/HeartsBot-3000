@@ -25,7 +25,19 @@ class SimpleGoldfishAgent(AgentBase):
     def pick_card(self, trick):
         trick_s = trick.get_s()
         if trick_s == "?":  # You're first up to bat, kid!
-            return self.get_legal_cards(trick).set[0]
+            leg_cards = self.get_legal_cards(trick)
+            h = leg_cards.get_cards_of_suit("H")
+            s = leg_cards.get_cards_of_suit("S")
+            r = leg_cards.get_cards_of_suit("R")
+            k = leg_cards.get_cards_of_suit("K")
+            if leg_cards.get_size_of_suit("R") > 0:
+                return r.set[0]
+            elif leg_cards.get_size_of_suit("K") > 0:
+                return k.set[0]
+            elif leg_cards.get_size_of_suit("S") > 0:
+                return s.set[0]
+            else:
+                return h.set[0]
         else:
             r10 = self.hand.find_card("R", 10)
             winning_v = trick.get_winning_c().get_v()
