@@ -80,16 +80,16 @@ class SGAgentWithSendCardLogic(SimpleGoldfishAgent):
             c_score = 0
             match card.get_s():
                 case "H":
-                    if card.get_v() >= 7:
-                        c_score += card.get_v() + self.hand.get_cards_of_suit_under_v("H", 7).size
+                    if card.get_v() >= 11:
+                        c_score += card.get_v() + self.hand.get_cards_of_suit_under_v("H", 11).size
                     else:
-                        c_score += card.get_v() - self.hand.get_cards_of_suit_above_v("H", 6).size
+                        c_score += card.get_v() - self.hand.get_cards_of_suit_above_v("H", 10).size
                 case "S":
                     if card.get_v() > 12:
                         c_score += 10 * 13 - self.hand.get_size_of_suit("S")
                     elif card.get_v() == 12:
                         if self.hand.get_cards_of_suit(
-                                "S").size > 7:  # Nobody can burn through your "safe" spades at >7.
+                                "S").size > 5:  # Nobody can burn through your "safe" spades at >5.
                             c_score += 0  # Just pawn it off on someone else
                         else:
                             c_score += (20 - self.hand.get_size_of_suit("S"))
